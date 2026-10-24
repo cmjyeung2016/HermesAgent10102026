@@ -37,6 +37,11 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          # Auto-enable Pages (Actions source) on first run; the GITHUB_TOKEN
+          # carries the `pages: write` permission declared above. Safe on
+          # subsequent runs (idempotent).
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
