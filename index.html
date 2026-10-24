@@ -3,506 +3,410 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>待辦清單 · Todo</title>
-<meta name="description" content="A modern, self-contained Todo list web app." />
+<title>Web App 導覽 · Jimmy</title>
+<meta name="description" content="集中管理所有網頁應用：搜尋、分類與狀態一覽無遺。" />
 <style>
   :root{
-    --bg1:#eef2ff;
-    --bg2:#f8fafc;
-    --card:#ffffff;
-    --card-border:rgba(15,23,42,.06);
-    --text:#0f172a;
-    --muted:#64748b;
-    --faint:#94a3b8;
-    --accent:#6366f1;
-    --accent-2:#8b5cf6;
+    --bg1:#eef2ff; --bg2:#f8fafc;
+    --card:#ffffff; --card-border:rgba(15,23,42,.07);
+    --text:#0f172a; --muted:#64748b; --faint:#94a3b8;
+    --accent:#6366f1; --accent-2:#8b5cf6;
     --accent-soft:rgba(99,102,241,.10);
-    --done:#94a3b8;
-    --danger:#ef4444;
+    --hover:rgba(15,23,42,.045);
     --track:rgba(15,23,42,.08);
-    --hover:rgba(15,23,42,.04);
     --ring:rgba(99,102,241,.35);
-    --shadow:0 20px 50px -20px rgba(30,41,59,.35), 0 4px 12px -6px rgba(30,41,59,.15);
-    --radius:22px;
+    --live:#16a34a; --live-bg:rgba(22,163,74,.12);
+    --dev:#d97706; --dev-bg:rgba(217,119,6,.14);
+    --shadow:0 18px 44px -22px rgba(30,41,59,.4), 0 4px 12px -6px rgba(30,41,59,.12);
+    --radius:18px;
   }
   [data-theme="dark"]{
-    --bg1:#0b1120;
-    --bg2:#0f172a;
-    --card:#151f31;
-    --card-border:rgba(148,163,184,.12);
-    --text:#f1f5f9;
-    --muted:#94a3b8;
-    --faint:#64748b;
-    --accent:#818cf8;
-    --accent-2:#a78bfa;
+    --bg1:#0b1120; --bg2:#0f172a;
+    --card:#151f31; --card-border:rgba(148,163,184,.13);
+    --text:#f1f5f9; --muted:#94a3b8; --faint:#64748b;
+    --accent:#818cf8; --accent-2:#a78bfa;
     --accent-soft:rgba(129,140,248,.14);
-    --done:#64748b;
-    --danger:#f87171;
-    --track:rgba(148,163,184,.12);
     --hover:rgba(148,163,184,.08);
+    --track:rgba(148,163,184,.12);
     --ring:rgba(129,140,248,.4);
-    --shadow:0 24px 60px -22px rgba(0,0,0,.7), 0 4px 14px -8px rgba(0,0,0,.6);
+    --live:#4ade80; --live-bg:rgba(74,222,128,.14);
+    --dev:#fbbf24; --dev-bg:rgba(251,191,36,.14);
+    --shadow:0 22px 54px -24px rgba(0,0,0,.75), 0 4px 14px -8px rgba(0,0,0,.6);
   }
-
   *{ box-sizing:border-box; }
-  html,body{ height:100%; }
+  html{ scroll-behavior:smooth; }
   body{
-    margin:0;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans",Arial,sans-serif;
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang TC","Microsoft JhengHei","Noto Sans TC",Arial,sans-serif;
     color:var(--text);
     background:
-      radial-gradient(1200px 700px at 12% -10%, var(--accent-soft), transparent 55%),
-      radial-gradient(1000px 600px at 100% 0%, var(--accent-soft), transparent 50%),
+      radial-gradient(1100px 640px at 10% -8%, var(--accent-soft), transparent 55%),
+      radial-gradient(900px 560px at 100% 0%, var(--accent-soft), transparent 50%),
       linear-gradient(160deg, var(--bg1), var(--bg2));
     background-attachment:fixed;
     -webkit-font-smoothing:antialiased;
-    display:flex; align-items:flex-start; justify-content:center;
-    padding:48px 16px;
-    transition:background .4s ease, color .3s ease;
+    min-height:100vh;
   }
-  [data-theme="dark"] body{ }
+  .wrap{ max-width:1080px; margin:0 auto; padding:44px 20px 64px; }
 
-  .app{
-    width:100%;
-    max-width:560px;
-    background:var(--card);
-    border:1px solid var(--card-border);
-    border-radius:var(--radius);
-    box-shadow:var(--shadow);
-    padding:26px 24px 22px;
-    transition:background .35s ease, border-color .35s ease;
-  }
-
-  /* Header */
-  .app-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
-  .title-wrap h1{
-    margin:0; font-size:26px; font-weight:800; letter-spacing:-.02em; line-height:1.1;
+  header.top{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+  h1{
+    margin:0; font-size:clamp(26px,4vw,34px); font-weight:800; letter-spacing:-.02em; line-height:1.15;
     background:linear-gradient(90deg, var(--accent), var(--accent-2));
     -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
   }
-  .sub{ margin:6px 0 0; font-size:13.5px; color:var(--muted); font-weight:500; }
+  .tagline{ margin:8px 0 0; font-size:14.5px; color:var(--muted); max-width:560px; line-height:1.55; }
+  .meta{ margin:6px 0 0; font-size:12px; color:var(--faint); font-weight:600; }
 
   .icon-btn{
-    flex:none; width:42px; height:42px; border-radius:13px;
-    border:1px solid var(--card-border); background:var(--hover);
-    color:var(--muted); cursor:pointer; display:grid; place-items:center;
-    transition:transform .15s ease, background .2s ease, color .2s ease, box-shadow .2s ease;
+    flex:none; width:42px; height:42px; border-radius:12px;
+    border:1px solid var(--card-border); background:var(--hover); color:var(--muted);
+    cursor:pointer; display:grid; place-items:center;
+    transition:transform .15s ease, background .2s ease, color .2s ease;
   }
-  .icon-btn:hover{ color:var(--text); transform:translateY(-1px); box-shadow:0 6px 16px -8px rgba(0,0,0,.4); }
-  .icon-btn:active{ transform:translateY(0) scale(.96); }
-  .icon-btn svg{ width:20px; height:20px; }
+  .icon-btn:hover{ color:var(--text); transform:translateY(-1px); }
+  .icon-btn svg{ width:19px; height:19px; }
   [data-theme="light"] .icon-btn .moon{ display:none; }
   [data-theme="dark"] .icon-btn .sun{ display:none; }
 
-  /* Progress */
-  .progress{ margin:20px 0 16px; }
-  .progress-track{
-    height:7px; border-radius:99px; background:var(--track); overflow:hidden;
+  /* Toolbar */
+  .toolbar{ margin:26px 0 8px; display:flex; flex-direction:column; gap:12px; }
+  .search{
+    position:relative; display:flex; align-items:center;
   }
-  .progress-fill{
-    height:100%; width:0;
-    background:linear-gradient(90deg, var(--accent), var(--accent-2));
-    border-radius:99px; transition:width .5s cubic-bezier(.4,0,.2,1);
+  .search svg{ position:absolute; left:15px; width:18px; height:18px; color:var(--faint); pointer-events:none; }
+  .search input{
+    width:100%; font:inherit; font-size:15px; color:var(--text);
+    background:var(--card); border:1px solid var(--card-border); border-radius:14px;
+    padding:13px 44px 13px 44px; outline:none;
+    box-shadow:0 2px 10px -6px rgba(30,41,59,.25);
+    transition:border-color .2s, box-shadow .2s;
   }
-  .progress-label{ display:flex; justify-content:space-between; margin-top:8px; font-size:12px; color:var(--faint); font-weight:600; }
+  .search input::placeholder{ color:var(--faint); }
+  .search input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); }
+  .search .clear-search{
+    position:absolute; right:10px; width:28px; height:28px; border-radius:8px; border:none;
+    background:var(--hover); color:var(--muted); cursor:pointer; display:none; place-items:center;
+  }
+  .search.has-value .clear-search{ display:grid; }
+  .search .clear-search:hover{ color:var(--text); }
+  .search .clear-search svg{ width:14px; height:14px; position:static; }
 
-  /* Add form */
-  .add{ display:flex; gap:10px; }
-  .add input{
-    flex:1; min-width:0; font:inherit; font-size:15.5px; color:var(--text);
-    background:var(--hover); border:1px solid var(--card-border); border-radius:14px;
-    padding:13px 15px; outline:none; transition:border-color .2s, box-shadow .2s, background .2s;
-  }
-  .add input::placeholder{ color:var(--faint); }
-  .add input:focus{ border-color:var(--accent); box-shadow:0 0 0 4px var(--ring); background:var(--card); }
-  .add-btn{
-    flex:none; width:50px; border-radius:14px; border:none; cursor:pointer;
-    background:linear-gradient(135deg, var(--accent), var(--accent-2)); color:#fff;
-    display:grid; place-items:center; box-shadow:0 8px 18px -8px var(--accent);
-    transition:transform .15s ease, filter .2s ease;
-  }
-  .add-btn:hover{ filter:brightness(1.06); }
-  .add-btn:active{ transform:scale(.94); }
-  .add-btn svg{ width:22px; height:22px; }
-
-  /* Filters */
-  .filters{ display:flex; gap:8px; margin:18px 0 6px; }
-  .filter-btn{
+  .filters{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .fgroup{ display:flex; gap:6px; flex-wrap:wrap; }
+  .fsep{ width:1px; height:22px; background:var(--card-border); margin:0 4px; }
+  .pill{
     font:inherit; font-size:13px; font-weight:600; color:var(--muted);
-    background:transparent; border:1px solid var(--card-border); border-radius:99px;
-    padding:7px 14px; cursor:pointer; transition:all .18s ease;
+    background:var(--card); border:1px solid var(--card-border); border-radius:99px;
+    padding:7px 14px; cursor:pointer; transition:all .16s ease;
   }
-  .filter-btn:hover{ color:var(--text); background:var(--hover); }
-  .filter-btn.active{
+  .pill:hover{ color:var(--text); background:var(--hover); }
+  .pill.active{
     color:#fff; background:linear-gradient(135deg, var(--accent), var(--accent-2));
     border-color:transparent; box-shadow:0 6px 14px -8px var(--accent);
   }
-  .filter-btn .badge{
-    margin-left:6px; font-size:11px; font-weight:700; opacity:.8;
+  .pill .cnt{ margin-left:5px; font-size:11px; opacity:.75; }
+  .reset-btn{
+    font:inherit; font-size:13px; font-weight:600; color:var(--accent);
+    background:transparent; border:none; cursor:pointer; padding:7px 10px; border-radius:8px;
   }
+  .reset-btn:hover{ background:var(--accent-soft); }
 
-  /* List */
-  .list{ list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:10px; }
-  .task{
-    display:flex; align-items:center; gap:12px;
-    background:var(--hover); border:1px solid var(--card-border);
-    border-radius:15px; padding:12px 14px;
-    animation:enter .32s cubic-bezier(.16,1,.3,1) both;
-    transition:opacity .28s ease, transform .28s ease, background .2s ease, border-color .2s ease;
-  }
-  .task:hover{ background:var(--hover); border-color:var(--ring); }
-  .task.hidden{ display:none; }
-  .task.removing{ opacity:0; transform:translateX(24px) scale(.98); }
-  @keyframes enter{
-    from{ opacity:0; transform:translateY(10px) scale(.98); }
-    to{ opacity:1; transform:translateY(0) scale(1); }
-  }
+  .result-meta{ margin:14px 2px 10px; font-size:13px; color:var(--faint); font-weight:600; }
 
-  .check{
-    flex:none; width:24px; height:24px; border-radius:8px; cursor:pointer;
-    border:2px solid var(--faint); background:transparent; padding:0;
-    display:grid; place-items:center; transition:all .2s cubic-bezier(.4,0,.2,1);
+  /* Grid */
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
+  .card{
+    display:flex; flex-direction:column; gap:12px;
+    background:var(--card); border:1px solid var(--card-border); border-radius:var(--radius);
+    padding:20px; box-shadow:var(--shadow);
+    transition:transform .2s ease, border-color .2s ease;
+    animation:enter .4s cubic-bezier(.16,1,.3,1) both;
   }
-  .check:hover{ border-color:var(--accent); }
-  .check svg{ width:14px; height:14px; stroke:#fff; stroke-width:3; fill:none;
-    stroke-linecap:round; stroke-linejoin:round;
-    stroke-dasharray:24; stroke-dashoffset:24; transition:stroke-dashoffset .3s ease .05s; }
-  .task.done .check{ background:linear-gradient(135deg, var(--accent), var(--accent-2)); border-color:transparent; }
-  .task.done .check svg{ stroke-dashoffset:0; }
-
-  .task-text{
-    flex:1; font-size:15px; line-height:1.4; font-weight:500; color:var(--text);
-    word-break:break-word; min-height:21px; cursor:text;
-    border-radius:6px; padding:2px 4px; outline:none; transition:color .2s ease, background .2s ease;
+  .card:hover{ transform:translateY(-3px); border-color:var(--ring); }
+  @keyframes enter{ from{ opacity:0; transform:translateY(12px);} to{ opacity:1; transform:none;} }
+  .card-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+  .card h2{ margin:0; font-size:17px; font-weight:750; line-height:1.3; letter-spacing:-.01em; }
+  .badge{
+    flex:none; display:inline-flex; align-items:center; gap:6px;
+    font-size:11.5px; font-weight:700; border-radius:99px; padding:5px 11px; white-space:nowrap;
   }
-  .task.done .task-text{ color:var(--done); text-decoration:line-through; text-decoration-color:var(--faint); }
-  .task-text[contenteditable="true"]{ background:var(--accent-soft); }
-
-  .del{
-    flex:none; width:34px; height:34px; border-radius:10px; border:none; background:transparent;
-    color:var(--faint); cursor:pointer; display:grid; place-items:center;
-    opacity:0; transform:translateX(6px); transition:all .18s ease;
+  .badge .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .badge.live{ color:var(--live); background:var(--live-bg); }
+  .badge.dev{ color:var(--dev); background:var(--dev-bg); }
+  .badge.other{ color:var(--muted); background:var(--hover); }
+  .card p.desc{ margin:0; font-size:14px; line-height:1.6; color:var(--muted); flex:1; }
+  .tech{ display:flex; flex-wrap:wrap; gap:6px; }
+  .chip{
+    font-size:11.5px; font-weight:600; color:var(--accent);
+    background:var(--accent-soft); border-radius:7px; padding:4px 9px;
   }
-  .task:hover .del, .del:focus{ opacity:1; transform:translateX(0); }
-  .del:hover{ color:var(--danger); background:rgba(239,68,68,.10); }
-  .del:active{ transform:scale(.9); }
-  .del svg{ width:18px; height:18px; }
-  @media (hover:none){ .del{ opacity:1; transform:none; } }
-
-  /* Empty */
-  .empty{ text-align:center; padding:38px 10px; color:var(--faint); }
-  .empty-emoji{ font-size:38px; margin-bottom:10px; filter:grayscale(.2); }
-  .empty p{ margin:0; font-size:15px; font-weight:500; }
-
-  /* Footer */
-  .app-footer{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-top:18px; padding-top:16px; border-top:1px solid var(--card-border);
+  .card-foot{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    border-top:1px solid var(--card-border); padding-top:12px; margin-top:2px;
   }
-  .count{ font-size:13.5px; color:var(--muted); font-weight:500; }
-  .count b{ color:var(--text); font-weight:800; }
-  .clear{
-    font:inherit; font-size:13px; font-weight:600; color:var(--muted);
+  .cat{ font-size:12px; font-weight:600; color:var(--faint); }
+  .open-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font:inherit; font-size:13.5px; font-weight:700; color:var(--text); text-decoration:none;
     background:transparent; border:none; cursor:pointer; padding:6px 10px; border-radius:9px;
-    transition:all .18s ease;
+    transition:all .16s ease;
   }
-  .clear:hover:not(:disabled){ color:var(--danger); background:rgba(239,68,68,.08); }
-  .clear:disabled{ opacity:.4; cursor:not-allowed; }
+  .open-link:hover{ color:var(--accent); background:var(--accent-soft); }
+  .open-link svg{ width:15px; height:15px; }
+  .soon{ font-size:12.5px; font-weight:600; color:var(--faint); }
 
-  /* Focus visibility */
-  .filter-btn:focus-visible, .clear:focus-visible, .check:focus-visible, .del:focus-visible{
-    outline:3px solid var(--ring); outline-offset:2px;
+  /* Empty / error states */
+  .state{ text-align:center; padding:52px 12px; color:var(--faint); }
+  .state .emoji{ font-size:38px; margin-bottom:10px; filter:grayscale(.25); }
+  .state p{ margin:0; font-size:15px; font-weight:500; }
+  .state .sub{ margin-top:8px; font-size:13px; }
+
+  footer{
+    margin-top:44px; padding-top:18px; border-top:1px solid var(--card-border);
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;
+    font-size:12px; color:var(--faint);
   }
-  @media (prefers-reduced-motion:reduce){
-    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  .hint a{ color:var(--accent); text-decoration:none; font-weight:600; }
+
+  :focus-visible{ outline:3px solid var(--ring); outline-offset:2px; border-radius:8px; }
+  @media (prefers-reduced-motion:reduce){ *{ animation-duration:.001ms !important; transition-duration:.001ms !important; } }
+
+  /* Print */
+  @media print{
+    :root{ --bg1:#fff; --bg2:#fff; --card:#fff; --shadow:none; }
+    body{ background:#fff !important; }
+    .toolbar, .icon-btn, footer .hint{ display:none !important; }
+    .card{ box-shadow:none; border:1px solid #cbd5e1; break-inside:avoid; }
+    .grid{ grid-template-columns:repeat(2,1fr); gap:12px; }
+    .wrap{ padding:0; }
   }
 </style>
 </head>
 <body>
-  <main class="app" id="app">
-    <header class="app-header">
-      <div class="title-wrap">
-        <h1>待辦清單</h1>
-        <p class="sub" id="today"></p>
-      </div>
-      <button id="themeToggle" class="icon-btn" aria-label="切換深淺色主題">
-        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1 id="siteTitle">Web App 導覽</h1>
+      <p class="tagline" id="siteTagline"></p>
+      <p class="meta" id="siteMeta"></p>
+    </div>
+    <button id="themeToggle" class="icon-btn" aria-label="切換深淺色主題" type="button">
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <div class="toolbar">
+    <div class="search" id="searchBox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchInput" type="search" placeholder="搜尋專案名稱、簡介或技術…" autocomplete="off" aria-label="搜尋專案" />
+      <button class="clear-search" id="clearSearch" type="button" aria-label="清除搜尋">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
-    </header>
-
-    <div class="progress">
-      <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-      <div class="progress-label"><span id="pct">0%</span><span id="progText">0 / 0</span></div>
     </div>
-
-    <form id="addForm" class="add">
-      <input id="taskInput" type="text" placeholder="加入新任務…" maxlength="200" autocomplete="off" aria-label="新任務內容" />
-      <button type="submit" class="add-btn" aria-label="加入任務">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
-    </form>
-
-    <div class="filters" role="tablist" aria-label="任務篩選">
-      <button data-filter="all" class="filter-btn active">全部<span class="badge" data-badge="all"></span></button>
-      <button data-filter="active" class="filter-btn">進行中<span class="badge" data-badge="active"></span></button>
-      <button data-filter="done" class="filter-btn">已完成<span class="badge" data-badge="done"></span></button>
+    <div class="filters">
+      <div class="fgroup" id="catFilters" role="group" aria-label="按分類篩選"></div>
+      <div class="fsep" aria-hidden="true"></div>
+      <div class="fgroup" id="statusFilters" role="group" aria-label="按狀態篩選"></div>
+      <button class="reset-btn" id="resetBtn" type="button">重設篩選</button>
     </div>
+  </div>
 
-    <ul id="list" class="list"></ul>
+  <p class="result-meta" id="resultMeta" role="status" aria-live="polite"></p>
 
-    <div id="empty" class="empty" hidden>
-      <div class="empty-emoji" id="emptyEmoji">✨</div>
-      <p id="emptyText"></p>
-    </div>
+  <main id="grid" class="grid" aria-label="專案清單"></main>
 
-    <footer class="app-footer">
-      <span class="count"><b id="remaining">0</b> 項待辦</span>
-      <button id="clearDone" class="clear" disabled>清除已完成</button>
-    </footer>
-  </main>
+  <div id="stateEmpty" class="state" hidden>
+    <div class="emoji">🔍</div>
+    <p>找不到符合條件的專案</p>
+    <p class="sub">請調整搜尋詞或重設篩選</p>
+  </div>
+  <div id="stateError" class="state" hidden>
+    <div class="emoji">⚠️</div>
+    <p id="errMsg"></p>
+    <p class="sub">新增專案請修改倉庫中的 projects.json，再以 HTTP 方式開啟本站</p>
+  </div>
+
+  <footer>
+    <span id="footCount"></span>
+    <span class="hint">管理專案清單：<a href="projects.json" target="_blank" rel="noopener">projects.json</a>（純文字檔，可直接編輯）</span>
+  </footer>
+</div>
 
 <script>
 (function(){
   "use strict";
-  var STORAGE_KEY = "todoapp.v1";
-  var THEME_KEY = "todoapp.theme";
+  var THEME_KEY = "navigator.theme";
+  var grid = document.getElementById("grid");
+  var searchInput = document.getElementById("searchInput");
+  var searchBox = document.getElementById("searchBox");
+  var catBox = document.getElementById("catFilters");
+  var statusBox = document.getElementById("statusFilters");
+  var resetBtn = document.getElementById("resetBtn");
+  var resultMeta = document.getElementById("resultMeta");
+  var footCount = document.getElementById("footCount");
+  var emptyEl = document.getElementById("stateEmpty");
+  var errEl = document.getElementById("stateError");
+  var errMsg = document.getElementById("errMsg");
 
-  var listEl = document.getElementById("list");
-  var inputEl = document.getElementById("taskInput");
-  var addForm = document.getElementById("addForm");
-  var emptyEl = document.getElementById("empty");
-  var emptyText = document.getElementById("emptyText");
-  var emptyEmoji = document.getElementById("emptyEmoji");
-  var remainingEl = document.getElementById("remaining");
-  var clearBtn = document.getElementById("clearDone");
-  var progFill = document.getElementById("progressFill");
-  var progText = document.getElementById("progText");
-  var pctEl = document.getElementById("pct");
-  var filterBtns = Array.prototype.slice.call(document.querySelectorAll(".filter-btn"));
-
-  var tasks = load();
-  var filter = "all";
-
-  // ---- persistence ----
-  function load(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch(e){ return []; } }
-  function save(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); } catch(e){} }
-  function byId(id){ for(var i=0;i<tasks.length;i++){ if(tasks[i].id===id) return tasks[i]; } return null; }
-  function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-
-  // ---- date ----
-  function setToday(){
-    var d = new Date();
-    var names = ["週日","週一","週二","週三","週四","週五","週六"];
-    document.getElementById("today").textContent =
-      d.getFullYear() + " 年 " + (d.getMonth()+1) + " 月 " + d.getDate() + " 日 · " + names[d.getDay()];
-  }
+  var STATUS_LABEL = { live:"已上線", dev:"開發中" };
+  var projects = [], categories = [], state = { q:"", cat:"all", status:"all" };
 
   // ---- theme ----
-  function applyTheme(t){
-    document.documentElement.setAttribute("data-theme", t);
-    try { localStorage.setItem(THEME_KEY, t); } catch(e){}
-  }
-  function initTheme(){
-    var stored = null;
-    try { stored = localStorage.getItem(THEME_KEY); } catch(e){}
-    if (stored === "dark" || stored === "light"){ applyTheme(stored); return; }
+  function applyTheme(t){ document.documentElement.setAttribute("data-theme", t); try{ localStorage.setItem(THEME_KEY, t); }catch(e){} }
+  (function(){
+    var stored = null; try{ stored = localStorage.getItem(THEME_KEY); }catch(e){}
+    if(stored === "dark" || stored === "light"){ applyTheme(stored); return; }
     var mq = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
     applyTheme(mq && mq.matches ? "dark" : "light");
-  }
+  })();
   document.getElementById("themeToggle").addEventListener("click", function(){
-    var cur = document.documentElement.getAttribute("data-theme");
-    applyTheme(cur === "dark" ? "light" : "dark");
+    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
   });
 
-  // ---- DOM builders ----
-  var SVG_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
-  var SVG_TRASH = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6"/></svg>';
-
-  function createItem(task){
-    var li = document.createElement("li");
-    li.className = "task" + (task.done ? " done" : "");
-    li.dataset.id = task.id;
-    li.dataset.status = task.done ? "done" : "active";
-
-    var check = document.createElement("button");
-    check.className = "check";
-    check.type = "button";
-    check.setAttribute("aria-label", task.done ? "標記為未完成" : "標記為已完成");
-    check.innerHTML = SVG_CHECK;
-    check.addEventListener("click", function(){ toggle(task.id); });
-
-    var text = document.createElement("span");
-    text.className = "task-text";
-    text.textContent = task.text;
-    text.title = "雙擊可編輯";
-    text.addEventListener("dblclick", function(){ startEdit(li, text, task); });
-
-    var del = document.createElement("button");
-    del.className = "del";
-    del.type = "button";
-    del.setAttribute("aria-label", "刪除任務");
-    del.innerHTML = SVG_TRASH;
-    del.addEventListener("click", function(){ removeTask(task.id); });
-
-    li.appendChild(check);
-    li.appendChild(text);
-    li.appendChild(del);
-    return li;
-  }
-
-  // ---- actions ----
-  function addTask(raw){
-    var text = (raw || "").trim();
-    if (!text) return;
-    var task = { id: uid(), text: text, done: false, created: Date.now() };
-    tasks.push(task);
-    save();
-    var li = createItem(task);
-    listEl.appendChild(li);
-    inputEl.value = "";
-    applyFilter();
-    updateMeta();
-    inputEl.focus();
-  }
-
-  function toggle(id){
-    var t = byId(id); if(!t) return;
-    t.done = !t.done;
-    save();
-    var li = listEl.querySelector('.task[data-id="'+id+'"]');
-    if(li){
-      li.classList.toggle("done", t.done);
-      li.dataset.status = t.done ? "done" : "active";
-      var check = li.querySelector(".check");
-      if(check) check.setAttribute("aria-label", t.done ? "標記為未完成" : "標記為已完成");
-    }
-    applyFilter();
-    updateMeta();
-  }
-
-  function removeTask(id){
-    var li = listEl.querySelector('.task[data-id="'+id+'"]');
-    var doRemove = function(){
-      var i = tasks.findIndex(function(t){ return t.id===id; });
-      if(i>-1) tasks.splice(i,1);
-      save();
-      if(li && li.parentNode) li.parentNode.removeChild(li);
-      applyFilter();
-      updateMeta();
-    };
-    if(li){
-      li.classList.add("removing");
-      var finished = false;
-      var fin = function(){ if(finished) return; finished = true; doRemove(); };
-      li.addEventListener("animationend", fin, { once:true });
-      setTimeout(fin, 320); // safety net
-    } else { doRemove(); }
-  }
-
-  function clearDone(){
-    var ids = tasks.filter(function(t){ return t.done; }).map(function(t){ return t.id; });
-    ids.forEach(removeTask);
-  }
-
-  function startEdit(li, textEl, task){
-    if(textEl.isContentEditable) return;
-    textEl.contentEditable = "true";
-    textEl.focus();
-    var range = document.createRange();
-    range.selectNodeContents(textEl);
-    var sel = window.getSelection();
-    sel.removeAllRanges(); sel.addRange(range);
-    var finish = function(){
-      textEl.contentEditable = "false";
-      var v = textEl.textContent.replace(/\s+/g," ").trim();
-      if(v && v !== task.text){ task.text = v; save(); }
-      else { textEl.textContent = task.text; }
-      textEl.removeEventListener("blur", finish);
-      textEl.removeEventListener("keydown", onKey);
-      updateMeta();
-    };
-    var onKey = function(e){
-      if(e.key === "Enter"){ e.preventDefault(); textEl.blur(); }
-      else if(e.key === "Escape"){ textEl.textContent = task.text; textEl.blur(); }
-    };
-    textEl.addEventListener("blur", finish);
-    textEl.addEventListener("keydown", onKey);
-  }
-
-  // ---- filter + meta ----
-  function applyFilter(){
-    filterBtns.forEach(function(b){ b.classList.toggle("active", b.dataset.filter===filter); });
-    var visible = 0;
-    tasks.forEach(function(t){
-      var li = listEl.querySelector('.task[data-id="'+t.id+'"]');
-      if(!li) return;
-      var show = filter==="all" || (filter==="active" ? !t.done : t.done);
-      li.classList.toggle("hidden", !show);
-      if(show) visible++;
+  function esc(s){
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
     });
-    // badges
-    var total = tasks.length;
-    var done = tasks.filter(function(t){return t.done;}).length;
-    var active = total - done;
-    setBadge("all", total);
-    setBadge("active", active);
-    setBadge("done", done);
-    showEmpty(visible, total, done, active);
   }
 
-  function setBadge(key, n){
-    var el = document.querySelector('.badge[data-badge="'+key+'"]');
-    if(!el) return;
-    el.textContent = n > 0 ? n : "";
-    el.style.display = n > 0 ? "inline" : "none";
+  function buildFilters(){
+    // categories (dynamic from data)
+    catBox.innerHTML = "";
+    addPill(catBox, "all", "全部分類", projects.length, "cat");
+    categories.forEach(function(c){
+      var n = projects.filter(function(p){ return p.category === c; }).length;
+      addPill(catBox, c, c, n, "cat");
+    });
+    // statuses
+    var present = ["live","dev"].filter(function(s){ return projects.some(function(p){ return p.status === s; }); });
+    var unknown = [];
+    projects.forEach(function(p){ if(p.status && present.indexOf(p.status) === -1 && unknown.indexOf(p.status) === -1) unknown.push(p.status); });
+    statusBox.innerHTML = "";
+    addPill(statusBox, "all", "全部狀態", projects.length, "status");
+    present.forEach(function(s){
+      var n = projects.filter(function(p){ return p.status === s; }).length;
+      addPill(statusBox, s, STATUS_LABEL[s] || s, n, "status");
+    });
+    unknown.forEach(function(s){
+      var n = projects.filter(function(p){ return p.status === s; }).length;
+      addPill(statusBox, s, s, n, "status");
+    });
   }
 
-  function showEmpty(visible, total, done, active){
-    if(visible > 0){ emptyEl.hidden = true; return; }
-    emptyEl.hidden = false;
-    if(total === 0){ emptyEmoji.textContent = "✨"; emptyText.textContent = "還沒有任務，加入第一項吧"; }
-    else if(filter === "active"){ emptyEmoji.textContent = "🎉"; emptyText.textContent = "所有任務都已完成！"; }
-    else if(filter === "done"){ emptyEmoji.textContent = "🗂️"; emptyText.textContent = "還沒有已完成的任務"; }
-    else { emptyEmoji.textContent = "✨"; emptyText.textContent = "還沒有任務"; }
+  function addPill(parent, key, label, count, group){
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "pill";
+    b.dataset.group = group;
+    b.dataset.value = key;
+    b.setAttribute("aria-pressed", state[group] === key ? "true" : "false");
+    b.innerHTML = esc(label) + '<span class="cnt">' + count + '</span>';
+    b.addEventListener("click", function(){
+      state[group] = key;
+      syncPills();
+      render();
+    });
+    parent.appendChild(b);
   }
 
-  function updateMeta(){
-    var total = tasks.length;
-    var done = tasks.filter(function(t){return t.done;}).length;
-    var remaining = total - done;
-    remainingEl.textContent = remaining;
-    clearBtn.disabled = (done === 0);
-    var pct = total ? Math.round(done/total*100) : 0;
-    progFill.style.width = pct + "%";
-    pctEl.textContent = pct + "%";
-    progText.textContent = done + " / " + total;
+  function syncPills(){
+    catBox.querySelectorAll(".pill").forEach(function(b){
+      var on = state.cat === b.dataset.value;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+    statusBox.querySelectorAll(".pill").forEach(function(b){
+      var on = state.status === b.dataset.value;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function matches(p){
+    var q = state.q.trim().toLowerCase();
+    if(q){
+      var hay = [p.name, p.description, (p.tech||[]).join(" "), p.category, STATUS_LABEL[p.status]||p.status].join(" ").toLowerCase();
+      if(hay.indexOf(q) === -1) return false;
+    }
+    if(state.cat !== "all" && p.category !== state.cat) return false;
+    if(state.status !== "all" && p.status !== state.status) return false;
+    return true;
+  }
+
+  function cardHTML(p, i){
+    var label = STATUS_LABEL[p.status] || (p.status || "未標示");
+    var cls = p.status === "live" ? "live" : (p.status === "dev" ? "dev" : "other");
+    var chips = (p.tech||[]).map(function(t){ return '<span class="chip">' + esc(t) + '</span>'; }).join("");
+    var link = "";
+    if(p.url){
+      var ext = p.external || String(p.url).indexOf("http") === 0;
+      var tgt = ext ? ' target="_blank" rel="noopener" ' : "";
+      var icon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>';
+      link = '<a class="open-link" href="' + esc(p.url) + '"' + tgt + '>開啟專案' + icon + '</a>';
+    } else {
+      link = '<span class="soon">尚未發布</span>';
+    }
+    return '<article class="card" style="animation-delay:' + (i*45) + 'ms">' +
+      '<div class="card-top"><h2>' + esc(p.name) + '</h2>' +
+      '<span class="badge ' + cls + '"><span class="dot"></span>' + esc(label) + '</span></div>' +
+      '<p class="desc">' + esc(p.description || "") + '</p>' +
+      (chips ? '<div class="tech" aria-label="技術堆疊">' + chips + '</div>' : "") +
+      '<div class="card-foot"><span class="cat">分類：' + esc(p.category || "未分類") + '</span>' + link + '</div>' +
+      '</article>';
+  }
+
+  function render(){
+    var list = projects.filter(matches);
+    grid.innerHTML = list.map(cardHTML).join("");
+    emptyEl.hidden = list.length > 0;
+    var active = state.q || state.cat !== "all" || state.status !== "all";
+    resultMeta.textContent = active
+      ? "顯示 " + list.length + " / " + projects.length + " 個專案（篩選中）"
+      : "共 " + projects.length + " 個專案";
+    footCount.textContent = "最後更新：" + (projects.__meta_updated || "未知日期");
   }
 
   // ---- events ----
-  addForm.addEventListener("submit", function(e){
-    e.preventDefault();
-    addTask(inputEl.value);
+  searchInput.addEventListener("input", function(){
+    state.q = searchInput.value;
+    searchBox.classList.toggle("has-value", !!searchInput.value);
+    render();
   });
-  clearBtn.addEventListener("click", clearDone);
-  filterBtns.forEach(function(b){
-    b.addEventListener("click", function(){
-      filter = b.dataset.filter;
-      applyFilter();
-    });
+  document.getElementById("clearSearch").addEventListener("click", function(){
+    searchInput.value = ""; state.q = "";
+    searchBox.classList.remove("has-value");
+    render(); searchInput.focus();
+  });
+  resetBtn.addEventListener("click", function(){
+    state = { q:"", cat:"all", status:"all" };
+    searchInput.value = "";
+    searchBox.classList.remove("has-value");
+    syncPills(); render();
   });
 
-  // ---- init ----
-  initTheme();
-  setToday();
-  tasks.forEach(function(t, i){
-    var li = createItem(t);
-    listEl.appendChild(li);
-    li.style.animationDelay = (i * 45) + "ms"; // stagger initial reveal
-    setTimeout(function(){ li.style.animationDelay = ""; }, 700);
-  });
-  applyFilter();
-  updateMeta();
+  // ---- load ----
+  fetch("projects.json", { cache:"no-store" })
+    .then(function(r){
+      if(!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function(d){
+      var site = d.site || {};
+      document.getElementById("siteTitle").textContent = site.title || "Web App 導覽";
+      document.getElementById("siteTagline").textContent = site.tagline || "";
+      document.getElementById("siteMeta").textContent = "資料來源：projects.json" + (site.updated ? " · 最後更新 " + site.updated : "");
+      document.title = (site.title ? site.title + " · " : "") + "Web App 導覽";
+      projects = Array.isArray(d.projects) ? d.projects : [];
+      projects.__meta_updated = site.updated || "（檔案未標示日期）";
+      categories = projects.reduce(function(acc,p){ var c = p.category || "未分類"; if(acc.indexOf(c)===-1) acc.push(c); return acc; }, []);
+      buildFilters(); syncPills(); render();
+    })
+    .catch(function(e){
+      grid.innerHTML = "";
+      errEl.hidden = false;
+      errMsg.textContent = "無法讀取 projects.json（" + e.message + "）。此頁面需透過 HTTP 伺服器開啟；直接雙擊檔案（file://）時瀏覽器會阻擋讀取。";
+    });
 })();
 </script>
 </body>

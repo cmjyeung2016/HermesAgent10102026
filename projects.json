@@ -1,0 +1,29 @@
+{
+  "site": {
+    "title": "Jimmy 的 Web App 導覽",
+    "tagline": "集中管理所有網頁應用 — 搜尋、分類與狀態一覽無遺。新增專案只需修改此檔案。"
+  },
+  "updated": "2026-10-24",
+  "projects": [
+    {
+      "id": "todo-list",
+      "name": "待辦清單 Todo List",
+      "category": "工具",
+      "description": "單一 HTML、零依賴的待辦應用：加入、完成、刪除、篩選、內聯編輯，深淺色主題與本地持久化。",
+      "tech": ["HTML", "CSS", "JavaScript"],
+      "status": "live",
+      "url": "/todo/",
+      "external": false
+    },
+    {
+      "id": "sales-dashboard",
+      "name": "銷售儀表板 Dashboard",
+      "category": "分析",
+      "description": "以 Dashboard_Data.xlsx 為源的互動式繁體中文銷售儀表板，含 KPI、趨勢圖、篩選與可搜尋明細表。",
+      "tech": ["HTML", "CSS", "JavaScript", "SVG"],
+      "status": "dev",
+      "url": null,
+      "external": false
+    }
+  ]
+}
